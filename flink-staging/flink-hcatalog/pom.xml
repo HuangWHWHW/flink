@@ -48,7 +48,26 @@ under the License.
 		</dependency>
 
 	</dependencies>
-
+	
+	<profiles>
+		<profile>
+			<id>catalog-repo2</id>
+			<repositories>
+				<!-- Cloudera -->
+				<repository>
+					<id>catalog-2-repo2</id>
+					<url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
+	
 	<build>
 		<plugins>
 			<!-- Scala Compiler -->
