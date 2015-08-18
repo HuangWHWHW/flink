@@ -22,6 +22,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +173,12 @@ public class CompactingHashTable<T> extends AbstractMutableHashTable<T> {
 	/** Temporary storage for partition compaction (always attempts to allocate
 	 * as many segments as the largest partition) */
 	private InMemoryPartition<T> compactionMemory;
-	
+
+	/** Temporary storage for partition pages size
+	 * K - size of partition pages
+	 * V - count of the same size */
+	private TreeMap<Integer, Integer> blockCount;
+
 	/** The number of buckets in the current table. The bucket array is not necessarily fully
 	 * used, when not all buckets that would fit into the last segment are actually used. */
 	private int numBuckets;
@@ -237,6 +243,8 @@ public class CompactingHashTable<T> extends AbstractMutableHashTable<T> {
 		this.bucketsPerSegmentBits = MathUtils.log2strict(bucketsPerSegment);
 		
 		this.partitions = new ArrayList<InMemoryPartition<T>>();
+
+		this.blockCount.clear();
 		
 		// because we allow to open and close multiple times, the state is initially closed
 		this.closed = true;
@@ -688,11 +696,17 @@ public class CompactingHashTable<T> extends AbstractMutableHashTable<T> {
 
 	private void createPartitions(int numPartitions) {
 		this.partitions.clear();
+		this.blockCount.clear();
 		
 		ListMemorySegmentSource memSource = new ListMemorySegmentSource(this.availableMemory);
 		
 		for (int i = 0; i < numPartitions; i++) {
 			this.partitions.add(new InMemoryPartition<T>(this.buildSideSerializer, i, memSource, this.segmentSize, pageSizeInBits));
+			if (this.blockCount.get(1) != null) {
+				this.blockCount.put(1, this.blockCount.get(1) + 1);
+			} else {
+				this.blockCount.put(1, 1);
+			}
 		}
 		this.compactionMemory = new InMemoryPartition<T>(this.buildSideSerializer, -1, memSource, this.segmentSize, pageSizeInBits);
 	}
@@ -702,6 +716,7 @@ public class CompactingHashTable<T> extends AbstractMutableHashTable<T> {
 			p.clearAllMemory(this.availableMemory);
 		}
 		this.partitions.clear();
+		this.blockCount.clear();
 		this.compactionMemory.clearAllMemory(availableMemory);
 	}
 	
@@ -819,26 +834,14 @@ public class CompactingHashTable<T> extends AbstractMutableHashTable<T> {
 	 * @return number of memory segments in the largest partition
 	 */
 	private int getMaxPartition() {
-		int maxPartition = 0;
-		for(InMemoryPartition<T> p1 : this.partitions) {
-			if(p1.getBlockCount() > maxPartition) {
-				maxPartition = p1.getBlockCount();
-			}
-		}
-		return maxPartition;
+		return this.blockCount.lastKey();
 	}
 	
 	/**
 	 * @return number of memory segments in the smallest partition
 	 */
 	private int getMinPartition() {
-		int minPartition = Integer.MAX_VALUE;
-		for(InMemoryPartition<T> p1 : this.partitions) {
-			if(p1.getBlockCount() < minPartition) {
-				minPartition = p1.getBlockCount();
-			}
-		}
-		return minPartition;
+		return this.blockCount.firstKey();
 	}
 	
 	/**
@@ -1075,6 +1078,14 @@ public class CompactingHashTable<T> extends AbstractMutableHashTable<T> {
 		this.compactionMemory.clearAllMemory(availableMemory);
 		this.compactionMemory.allocateSegments(1);
 		this.compactionMemory.pushDownPages();
+
+		int block = partitions.get(partitionNumber).getBlockCount();
+		if (this.blockCount.get(block) > 1){
+			this.blockCount.put(block, this.blockCount.get(block) - 1);
+		} else {
+			this.blockCount.remove(block);
+		}
+
 		T tempHolder = this.buildSideSerializer.createInstance();
 		final int numPartitions = this.partitions.size();
 		InMemoryPartition<T> partition = this.partitions.remove(partitionNumber);
@@ -1126,6 +1137,15 @@ public class CompactingHashTable<T> extends AbstractMutableHashTable<T> {
 		this.partitions.get(partitionNumber).numOverflowSegments = partition.numOverflowSegments;
 		this.partitions.get(partitionNumber).nextOverflowBucket = partition.nextOverflowBucket;
 		this.partitions.get(partitionNumber).setIsCompacted(true);
+
+		block = compactionMemory.getBlockCount();
+		if (this.blockCount.get(block) != null) {
+			this.blockCount.put(block, this.blockCount.get(block) + 1);
+		} else {
+			this.blockCount.put(block, 1);
+		}
+
+
 		//this.partitions.get(partitionNumber).pushDownPages();
 		this.compactionMemory = partition;
 		this.compactionMemory.resetRecordCounter();
