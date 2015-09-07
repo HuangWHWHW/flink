@@ -718,8 +718,13 @@ class DataStream[T](javaStream: JavaStream[T]) {
    * is written.
    *
    */
-  def writeAsText(path: String, millis: Long = 0): DataStreamSink[T] =
-    javaStream.writeAsText(path, millis)
+  def writeAsText(path: String, writeMode: FileSystem.WriteMode = null, millis: Long = 0): DataStreamSink[T] = {
+    if (writeMode != null) {
+      javaStream.writeAsText(path, writeMode, millis)
+    } else {
+      javaStream.writeAsText(path, millis)
+    }
+  }
 
   /**
    * Writes a DataStream to the file specified by path in text format. The
