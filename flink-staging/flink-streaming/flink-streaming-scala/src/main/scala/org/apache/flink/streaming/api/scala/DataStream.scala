@@ -718,7 +718,7 @@ class DataStream[T](javaStream: JavaStream[T]) {
    * is written.
    *
    */
-  def writeAsText(path: String, writeMode: FileSystem.WriteMode = null, millis: Long = 0): DataStreamSink[T] = {
+  def writeAsText(path: String, millis: Long = 0, writeMode: FileSystem.WriteMode = null): DataStreamSink[T] = {
     if (writeMode != null) {
       javaStream.writeAsText(path, writeMode, millis)
     } else {
