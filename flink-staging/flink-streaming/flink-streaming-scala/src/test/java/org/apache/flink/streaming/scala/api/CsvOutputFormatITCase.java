@@ -19,6 +19,7 @@ package org.apache.flink.streaming.scala.api;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.scala.OutputFormatTestPrograms;
 import org.apache.flink.streaming.util.StreamingProgramTestBase;
 import org.apache.flink.test.testdata.WordCountData;
@@ -36,6 +37,10 @@ public class CsvOutputFormatITCase extends StreamingProgramTestBase {
 	@Override
 	protected void testProgram() throws Exception {
 		OutputFormatTestPrograms.wordCountToCsv(WordCountData.TEXT, resultPath);
+		OutputFormatTestPrograms.wordCountToCsv(WordCountData.TEXT, resultPath, 1);
+		OutputFormatTestPrograms.wordCountToCsv(WordCountData.TEXT, resultPath, FileSystem.WriteMode.OVERWRITE);
+		OutputFormatTestPrograms.wordCountToCsv(WordCountData.TEXT, resultPath, FileSystem.WriteMode.OVERWRITE, 1);
+		OutputFormatTestPrograms.wordCountToCsv(WordCountData.TEXT, resultPath, FileSystem.WriteMode.OVERWRITE, 1, "\n", ",");
 	}
 
 	@Override

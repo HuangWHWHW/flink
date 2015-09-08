@@ -925,11 +925,7 @@ public class DataStream<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X extends Tuple> DataStreamSink<T> writeAsCsv(String path) {
-		Preconditions.checkArgument(getType().isTupleType(),
-				"The writeAsCsv() method can only be used on data sets of tuples.");
-		CsvOutputFormat<X> of = new CsvOutputFormat<X>(new Path(path),
-				CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
-		return write((OutputFormat<T>) of, 0L);
+		return writeAsCsv(path, null, 0L, CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
 	}
 
 	/**
@@ -949,11 +945,7 @@ public class DataStream<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X extends Tuple> DataStreamSink<T> writeAsCsv(String path, long millis) {
-		Preconditions.checkArgument(getType().isTupleType(),
-				"The writeAsCsv() method can only be used on data sets of tuples.");
-		CsvOutputFormat<X> of = new CsvOutputFormat<X>(new Path(path),
-				CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
-		return write((OutputFormat<T>) of, millis);
+		return writeAsCsv(path, null, millis, CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
 	}
 
 	/**
@@ -973,14 +965,7 @@ public class DataStream<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X extends Tuple> DataStreamSink<T> writeAsCsv(String path, WriteMode writeMode) {
-		Preconditions.checkArgument(getType().isTupleType(),
-				"The writeAsCsv() method can only be used on data sets of tuples.");
-		CsvOutputFormat<X> of = new CsvOutputFormat<X>(new Path(path),
-				CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
-		if (writeMode != null) {
-			of.setWriteMode(writeMode);
-		}
-		return write((OutputFormat<T>) of, 0L);
+		return writeAsCsv(path, writeMode, 0L, CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
 	}
 
 	/**
@@ -1004,10 +989,38 @@ public class DataStream<T> {
 	@SuppressWarnings("unchecked")
 	public <X extends Tuple> DataStreamSink<T> writeAsCsv(String path, WriteMode writeMode,
 			long millis) {
+		return writeAsCsv(path, writeMode, millis, CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
+	}
+
+	/**
+	 * Writes a DataStream to the file specified by path in csv format. The
+	 * writing is performed periodically, in every millis milliseconds.
+	 *
+	 * <p>
+	 * For every field of an element of the DataStream the result of {@link Object#toString()}
+	 * is written. This method can only be used on data streams of tuples.
+	 *
+	 * @param path
+	 *            the path pointing to the location the text file is written to
+	 * @param writeMode
+	 *            Controls the behavior for existing files. Options are
+	 *            NO_OVERWRITE and OVERWRITE.
+	 * @param millis
+	 *            the file update frequency
+	 *
+	 * @return the closed DataStream
+	 */
+	@SuppressWarnings("unchecked")
+	public <X extends Tuple> DataStreamSink<T> writeAsCsv(
+			String path,
+			WriteMode writeMode,
+			long millis,
+			String rowDelimiter,
+			String fieldDelimiter) {
 		Preconditions.checkArgument(getType().isTupleType(),
 				"The writeAsCsv() method can only be used on data sets of tuples.");
 		CsvOutputFormat<X> of = new CsvOutputFormat<X>(new Path(path),
-				CsvOutputFormat.DEFAULT_LINE_DELIMITER, CsvOutputFormat.DEFAULT_FIELD_DELIMITER);
+				rowDelimiter, fieldDelimiter);
 		if (writeMode != null) {
 			of.setWriteMode(writeMode);
 		}

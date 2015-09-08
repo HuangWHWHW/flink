@@ -17,6 +17,7 @@
 
 package org.apache.flink.streaming.scala.api;
 
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.scala.OutputFormatTestPrograms;
 import org.apache.flink.streaming.util.StreamingProgramTestBase;
 import org.apache.flink.test.testdata.WordCountData;
@@ -33,6 +34,11 @@ public class TextOutputFormatITCase extends StreamingProgramTestBase {
 	@Override
 	protected void testProgram() throws Exception {
 		OutputFormatTestPrograms.wordCountToText(WordCountData.TEXT, resultPath);
+		OutputFormatTestPrograms.wordCountToText(WordCountData.TEXT, resultPath, 1);
+		OutputFormatTestPrograms.wordCountToText(WordCountData.TEXT, resultPath, null);
+		OutputFormatTestPrograms.wordCountToText(WordCountData.TEXT, resultPath, FileSystem.WriteMode.OVERWRITE);
+		OutputFormatTestPrograms.wordCountToText(WordCountData.TEXT, resultPath, null, 1);
+		OutputFormatTestPrograms.wordCountToText(WordCountData.TEXT, resultPath, FileSystem.WriteMode.OVERWRITE, 1);
 	}
 
 	@Override

@@ -718,7 +718,45 @@ class DataStream[T](javaStream: JavaStream[T]) {
    * is written.
    *
    */
-  def writeAsText(path: String, millis: Long = 0, writeMode: FileSystem.WriteMode = null): DataStreamSink[T] = {
+  def writeAsText(path: String, millis: Long = 0): DataStreamSink[T] =
+    javaStream.writeAsText(path, millis)
+
+  /**
+   * Writes a DataStream to the file specified by path in text format. The
+   * writing is performed periodically, in every millis milliseconds. For
+   * every element of the DataStream the result of .toString
+   * is written.
+   *
+   * @param writeMode
+   * Control the behavior for existing files. Options are
+   * NO_OVERWRITE and OVERWRITE.
+   *
+   */
+  def writeAsText(
+      path: String,
+      writeMode: FileSystem.WriteMode): DataStreamSink[T] = {
+    if (writeMode != null) {
+      javaStream.writeAsText(path, writeMode)
+    } else {
+      javaStream.writeAsText(path)
+    }
+  }
+
+  /**
+   * Writes a DataStream to the file specified by path in text format. The
+   * writing is performed periodically, in every millis milliseconds. For
+   * every element of the DataStream the result of .toString
+   * is written.
+   *
+   * @param writeMode
+   * Control the behavior for existing files. Options are
+   * NO_OVERWRITE and OVERWRITE.
+   *
+   */
+  def writeAsText(
+      path: String,
+      writeMode: FileSystem.WriteMode,
+      millis: Long): DataStreamSink[T] = {
     if (writeMode != null) {
       javaStream.writeAsText(path, writeMode, millis)
     } else {
@@ -735,10 +773,72 @@ class DataStream[T](javaStream: JavaStream[T]) {
    */
   def writeAsCsv(
       path: String,
-      millis: Long = 0,
-      rowDelimiter: String = ScalaCsvOutputFormat.DEFAULT_LINE_DELIMITER,
-      fieldDelimiter: String = ScalaCsvOutputFormat.DEFAULT_FIELD_DELIMITER,
-      writeMode: FileSystem.WriteMode = null): DataStreamSink[T] = {
+      millis: Long = 0): DataStreamSink[T] = {
+    require(javaStream.getType.isTupleType, "CSV output can only be used with Tuple DataSets.")
+    val of = new ScalaCsvOutputFormat[Product](
+      new Path(path),
+      ScalaCsvOutputFormat.DEFAULT_LINE_DELIMITER,
+      ScalaCsvOutputFormat.DEFAULT_FIELD_DELIMITER)
+    javaStream.write(of.asInstanceOf[OutputFormat[T]], millis)
+  }
+
+  /**
+   * Writes a DataStream to the file specified by path in text format. The
+   * writing is performed periodically, in every millis milliseconds. For
+   * every element of the DataStream the result of .toString
+   * is written.
+   *
+   */
+  def writeAsCsv(
+      path: String,
+      writeMode: FileSystem.WriteMode): DataStreamSink[T] = {
+    require(javaStream.getType.isTupleType, "CSV output can only be used with Tuple DataSets.")
+    val of = new ScalaCsvOutputFormat[Product](
+      new Path(path),
+      ScalaCsvOutputFormat.DEFAULT_LINE_DELIMITER,
+      ScalaCsvOutputFormat.DEFAULT_FIELD_DELIMITER)
+    if (writeMode != null) {
+      of.setWriteMode(writeMode)
+    }
+    javaStream.write(of.asInstanceOf[OutputFormat[T]], 0L)
+  }
+
+  /**
+   * Writes a DataStream to the file specified by path in text format. The
+   * writing is performed periodically, in every millis milliseconds. For
+   * every element of the DataStream the result of .toString
+   * is written.
+   *
+   */
+  def writeAsCsv(
+      path: String,
+      writeMode: FileSystem.WriteMode,
+      millis: Long): DataStreamSink[T] = {
+    require(javaStream.getType.isTupleType, "CSV output can only be used with Tuple DataSets.")
+    val of = new ScalaCsvOutputFormat[Product](
+      new Path(path),
+      ScalaCsvOutputFormat.DEFAULT_LINE_DELIMITER,
+      ScalaCsvOutputFormat.DEFAULT_FIELD_DELIMITER)
+    if (writeMode != null) {
+      of.setWriteMode(writeMode)
+    }
+    javaStream.write(of.asInstanceOf[OutputFormat[T]], millis)
+  }
+
+  /**
+   * Writes a DataStream to the file specified by path in text format. The
+   * writing is performed periodically, in every millis milliseconds. For
+   * every element of the DataStream the result of .toString
+   * is written.
+   *
+   */
+  def writeAsCsv(
+      path: String,
+      writeMode: FileSystem.WriteMode,
+      millis: Long,
+      rowDelimiter: String,
+      fieldDelimiter: String
+    ): DataStreamSink[T] = {
     require(javaStream.getType.isTupleType, "CSV output can only be used with Tuple DataSets.")
     val of = new ScalaCsvOutputFormat[Product](new Path(path), rowDelimiter, fieldDelimiter)
     if (writeMode != null) {
