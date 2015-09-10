@@ -52,7 +52,7 @@ class CastingITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mo
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements((1: Byte, 1: Short, 1, 1L, 1.0f, 1.0d)).toTable
-      .select('_1 + "b", '_2 + "s", '_3 + "i", '_4 + "L", '_5 + "f", '_6 + "d")
+      .select('_1 + "b", '_2 + "s", '_3 + "i", '_4 + "L", '_5 + "f", '_6 + "d").javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -66,7 +66,7 @@ class CastingITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mo
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements((1: Byte, 1: Short, 1, 1L, 1.0f, 1.0d)).toTable
-      .select('_1 + 1, '_2 + 1, '_3 + 1L, '_4 + 1.0f, '_5 + 1.0d, '_6 + 1)
+      .select('_1 + 1, '_2 + 1, '_3 + 1L, '_4 + 1.0f, '_5 + 1.0d, '_6 + 1).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -82,7 +82,7 @@ class CastingITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mo
     val ds = env.fromElements(
       (1: Byte, 1: Short, 1, 1L, 1.0f, 1.0d),
       (2: Byte, 2: Short, 2, 2L, 2.0f, 2.0d)).as('a, 'b, 'c, 'd, 'e, 'f)
-      .filter('a > 1 && 'b > 1 && 'c > 1L && 'd > 1.0f && 'e > 1.0d  && 'f > 1)
+      .filter('a > 1 && 'b > 1 && 'c > 1L && 'd > 1.0f && 'e > 1.0d  && 'f > 1).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()

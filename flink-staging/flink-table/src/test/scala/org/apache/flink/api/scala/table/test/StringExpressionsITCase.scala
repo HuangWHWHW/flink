@@ -52,7 +52,7 @@ class StringExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsT
   def testSubstring(): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements(("AAAA", 2), ("BBBB", 1)).as('a, 'b)
-      .select('a.substring(0, 'b))
+      .select('a.substring(0, 'b)).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -63,7 +63,7 @@ class StringExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsT
   def testSubstringWithMaxEnd(): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements(("ABCD", 2), ("ABCD", 1)).as('a, 'b)
-      .select('a.substring('b))
+      .select('a.substring('b)).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -75,7 +75,7 @@ class StringExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsT
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements(("AAAA", 2.0), ("BBBB", 1.0)).as('a, 'b)
-      .select('a.substring(0, 'b))
+      .select('a.substring(0, 'b)).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -87,7 +87,7 @@ class StringExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsT
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements(("AAAA", "c"), ("BBBB", "d")).as('a, 'b)
-      .select('a.substring('b, 15))
+      .select('a.substring('b, 15)).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()

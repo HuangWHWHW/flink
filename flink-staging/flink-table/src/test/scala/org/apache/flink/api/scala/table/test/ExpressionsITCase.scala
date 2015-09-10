@@ -53,7 +53,7 @@ class ExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements((5, 10)).as('a, 'b)
-      .select('a - 5, 'a + 5, 'a / 2, 'a * 2, 'a % 2, -'a)
+      .select('a - 5, 'a + 5, 'a / 2, 'a * 2, 'a % 2, -'a).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -65,7 +65,7 @@ class ExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements((5, true)).as('a, 'b)
-      .select('b && true, 'b && false, 'b || false, !'b)
+      .select('b && true, 'b && false, 'b || false, !'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -77,7 +77,7 @@ class ExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = env.fromElements((5, 5, 4)).as('a, 'b, 'c)
-      .select('a > 'c, 'a >= 'b, 'a < 'c, 'a.isNull, 'a.isNotNull)
+      .select('a > 'c, 'a >= 'b, 'a < 'c, 'a.isNull, 'a.isNotNull).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -90,7 +90,7 @@ class ExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
     val env = ExecutionEnvironment.getExecutionEnvironment
 
     val ds = env.fromElements((3.toByte, 5.toByte)).as('a, 'b)
-      .select('a & 'b, 'a | 'b, 'a ^ 'b, ~'a)
+      .select('a & 'b, 'a | 'b, 'a ^ 'b, ~'a).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -103,7 +103,7 @@ class ExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
     val env = ExecutionEnvironment.getExecutionEnvironment
 
     val ds = env.fromElements((3, 5.toByte)).as('a, 'b)
-      .select('a & 'b, 'a | 'b, 'a ^ 'b, ~'a)
+      .select('a & 'b, 'a | 'b, 'a ^ 'b, ~'a).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -116,7 +116,7 @@ class ExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
     val env = ExecutionEnvironment.getExecutionEnvironment
 
     val ds = env.fromElements((3.0, 5)).as('a, 'b)
-      .select('a & 'b, 'a | 'b, 'a ^ 'b, ~'a)
+      .select('a & 'b, 'a | 'b, 'a ^ 'b, ~'a).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -129,7 +129,7 @@ class ExpressionsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
     val env = ExecutionEnvironment.getExecutionEnvironment
 
     val ds = env.fromElements((3, 5.toByte)).as('a, 'b)
-      .groupBy("a").select("a, a.count As cnt")
+      .groupBy("a").select("a, a.count As cnt").javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()

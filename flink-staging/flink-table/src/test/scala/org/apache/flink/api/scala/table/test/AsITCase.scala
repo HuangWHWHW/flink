@@ -54,7 +54,7 @@ class AsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode) {
   def testAs(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -70,7 +70,7 @@ class AsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode) {
   def testAsWithToFewFields(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -81,7 +81,7 @@ class AsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode) {
   def testAsWithToManyFields(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c, 'd)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c, 'd).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -92,7 +92,7 @@ class AsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode) {
   def testAsWithAmbiguousFields(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'b)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -104,7 +104,7 @@ class AsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode) {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     // as can only have field references
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a + 1, 'b, 'b)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a + 1, 'b, 'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -116,7 +116,7 @@ class AsITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode) {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
     // as can only have field references
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a as 'foo, 'b, 'b)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a as 'foo, 'b, 'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()

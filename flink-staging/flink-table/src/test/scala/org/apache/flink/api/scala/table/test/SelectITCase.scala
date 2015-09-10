@@ -53,7 +53,7 @@ class SelectITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mod
   def testSimpleSelectAll(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).toTable.select('_1, '_2, '_3)
+    val ds = CollectionDataSets.get3TupleDataSet(env).toTable.select('_1, '_2, '_3).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -69,7 +69,7 @@ class SelectITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mod
   def testSimpleSelectAllWithAs(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c).select('a, 'b, 'c)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c).select('a, 'b, 'c).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -87,7 +87,7 @@ class SelectITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mod
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = CollectionDataSets.get3TupleDataSet(env).toTable
       .select('_1 as 'a, '_2 as 'b)
-      .select('a, 'b)
+      .select('a, 'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -100,7 +100,7 @@ class SelectITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mod
   def testAsWithToFewFields(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -111,7 +111,7 @@ class SelectITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mod
   def testAsWithToManyFields(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c, 'd)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'c, 'd).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -122,7 +122,7 @@ class SelectITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mod
   def testAsWithAmbiguousFields(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'b)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b, 'b).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -134,7 +134,7 @@ class SelectITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mod
   def testOnlyFieldRefInAs(): Unit = {
 
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b as 'c, 'd)
+    val ds = CollectionDataSets.get3TupleDataSet(env).as('a, 'b as 'c, 'd).javaSet
 
     ds.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
