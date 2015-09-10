@@ -327,6 +327,29 @@ under the License.
 						</configuration>
 					</execution>
 
+                    <!-- SmartPCC -->
+                    <execution>
+                        <id>SmartPCC</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>SmartPccPoc</classifier>
+
+                            <archive>
+                                <manifestEntries>
+                                    <program-class>org.apache.flink.streaming.examples.SmartPCC.SmartPccPoc</program-class>
+                                </manifestEntries>
+                            </archive>
+
+                            <includes>
+                                <include>org/apache/flink/streaming/examples/SmartPCC/SmartPccPoc.class</include>
+                                <include>org/apache/flink/streaming/examples/SmartPCC/SmartPccPoc$*.class</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+
 					<!-- TopSpeedWindowing -->
 					<execution>
 						<id>TopSpeedWindowing</id>
