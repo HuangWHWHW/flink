@@ -1007,7 +1007,10 @@ public class DataStream<T> {
 	 *            NO_OVERWRITE and OVERWRITE.
 	 * @param millis
 	 *            the file update frequency
-	 *
+	 * @param rowDelimiter
+	 *            the delimiter for a row-data
+	 * @param fieldDelimiter
+	 *            the delimiter for a field-data
 	 * @return the closed DataStream
 	 */
 	@SuppressWarnings("unchecked")

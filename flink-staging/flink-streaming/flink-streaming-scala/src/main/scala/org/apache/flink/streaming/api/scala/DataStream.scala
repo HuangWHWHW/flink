@@ -717,15 +717,24 @@ class DataStream[T](javaStream: JavaStream[T]) {
    * every element of the DataStream the result of .toString
    * is written.
    *
+   * @param path
+   * the path pointing to the location the text file is written to
+   *
+   * @param millis
+	 * the file update frequency
+   *
    */
   def writeAsText(path: String, millis: Long = 0): DataStreamSink[T] =
     javaStream.writeAsText(path, millis)
 
   /**
    * Writes a DataStream to the file specified by path in text format. The
-   * writing is performed periodically, in every millis milliseconds. For
+   * writing is performed periodically by default 0ms. For
    * every element of the DataStream the result of .toString
    * is written.
+   *
+   * @param path
+   * the path pointing to the location the text file is written to
    *
    * @param writeMode
    * Control the behavior for existing files. Options are
@@ -748,9 +757,15 @@ class DataStream[T](javaStream: JavaStream[T]) {
    * every element of the DataStream the result of .toString
    * is written.
    *
+   * @param path
+   * the path pointing to the location the text file is written to
+   *
    * @param writeMode
    * Control the behavior for existing files. Options are
    * NO_OVERWRITE and OVERWRITE.
+   *
+   * @param millis
+	 * the file update frequency
    *
    */
   def writeAsText(
@@ -765,10 +780,17 @@ class DataStream[T](javaStream: JavaStream[T]) {
   }
 
   /**
-   * Writes a DataStream to the file specified by path in text format. The
-   * writing is performed periodically, in every millis milliseconds. For
-   * every element of the DataStream the result of .toString
-   * is written.
+   * Writes a DataStream to the file specified by path in csv format.
+   *
+   * <p>
+   * For every field of an element of the DataStream the result of {@link Object#toString()}
+   * is written. This method can only be used on data sets of tuples.
+   *
+   * @param path
+	 * the path pointing to the location the text file is written to
+   *
+   * @param millis
+	 * the file update frequency
    *
    */
   def writeAsCsv(
@@ -783,10 +805,18 @@ class DataStream[T](javaStream: JavaStream[T]) {
   }
 
   /**
-   * Writes a DataStream to the file specified by path in text format. The
-   * writing is performed periodically, in every millis milliseconds. For
-   * every element of the DataStream the result of .toString
-   * is written.
+   * Writes a DataStream to the file specified by path in csv format.
+   *
+   * <p>
+   * For every field of an element of the DataStream the result of {@link Object#toString()}
+   * is written. This method can only be used on data sets of tuples.
+   *
+   * @param path
+	 * the path pointing to the location the text file is written to
+   *
+   * @param writeMode
+   * Control the behavior for existing files. Options are
+   * NO_OVERWRITE and OVERWRITE.
    *
    */
   def writeAsCsv(
@@ -804,10 +834,21 @@ class DataStream[T](javaStream: JavaStream[T]) {
   }
 
   /**
-   * Writes a DataStream to the file specified by path in text format. The
-   * writing is performed periodically, in every millis milliseconds. For
-   * every element of the DataStream the result of .toString
-   * is written.
+   * Writes a DataStream to the file specified by path in csv format.
+   *
+   * <p>
+   * For every field of an element of the DataStream the result of {@link Object#toString()}
+   * is written. This method can only be used on data sets of tuples.
+   *
+   * @param path
+	 * the path pointing to the location the text file is written to
+   *
+   * @param writeMode
+   * Control the behavior for existing files. Options are
+   * NO_OVERWRITE and OVERWRITE.
+   *
+   * @param millis
+	 * the file update frequency
    *
    */
   def writeAsCsv(
@@ -826,10 +867,21 @@ class DataStream[T](javaStream: JavaStream[T]) {
   }
 
   /**
-   * Writes a DataStream to the file specified by path in text format. The
-   * writing is performed periodically, in every millis milliseconds. For
-   * every element of the DataStream the result of .toString
-   * is written.
+   * Writes a DataStream to the file specified by path in csv format.
+   *
+   * <p>
+   * For every field of an element of the DataStream the result of {@link Object#toString()}
+   * is written. This method can only be used on data sets of tuples.
+   *
+   * @param path
+	 * the path pointing to the location the text file is written to
+   *
+   * @param writeMode
+   * Control the behavior for existing files. Options are
+   * NO_OVERWRITE and OVERWRITE.
+   *
+   * @param millis
+	 * the file update frequency
    *
    */
   def writeAsCsv(
