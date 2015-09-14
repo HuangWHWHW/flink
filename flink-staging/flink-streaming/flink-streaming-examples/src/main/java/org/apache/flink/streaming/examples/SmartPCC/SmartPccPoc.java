@@ -1,7 +1,6 @@
 package org.apache.flink.streaming.examples.SmartPCC;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.api.java.tuple.Tuple7;
@@ -12,17 +11,22 @@ import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * Created by h00292103 on 2015/7/22.
  */
 public class SmartPccPoc {
 
+	public static final long FIVE_MINUS = 5 * 60 * 1000;
+
 	public static Logger LOG = LoggerFactory.getLogger(SmartPccPoc.class);
 
-	public static void main(String[] args) throws Exception {
+	public static HashMap<Long, Tuple3<String, Integer, Long>> hashTable = new HashMap<>();
+	public static LinkedList<Tuple3<Long, String, Long>> timeOrder = new LinkedList<>();
 
+	public static void main(String[] args) throws Exception {
 		if (!parseParameters(args)) {
 			return;
 		}
@@ -77,37 +81,67 @@ public class SmartPccPoc {
 				= s_edr.flatMap(new FlatMapFunction<Tuple6<Long, String, String, Integer, Integer, Integer>, Tuple7<Long, String, String, Integer, Integer, Integer, Integer>>() {
 			@Override
 			public void flatMap(Tuple6<Long, String, String, Integer, Integer, Integer> in, Collector<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>> out) throws Exception {
-				if (in.f2.equals("GPRS") && (in.f3 * 10 >= in.f4 * 9)){
+				if (in.f2.equals("GPRS") && (in.f3 * 10 >= in.f4 * 9)) {
 					out.collect(new Tuple7<Long, String, String, Integer, Integer, Integer, Integer>(in.f0, in.f1, in.f2, in.f3, in.f4, in.f5, 1));
-				}
-				else if (in.f2.equals("GPRS") && in.f4 == 0){
+				} else if (in.f2.equals("GPRS") && in.f4 == 0) {
 					out.collect(new Tuple7<Long, String, String, Integer, Integer, Integer, Integer>(in.f0, in.f1, in.f2, in.f3, in.f4, in.f5, 2));
-				}
-				else if (in.f2.equals("FREE") && in.f4 == 0) {
+				} else if (in.f2.equals("FREE") && in.f4 == 0) {
 					out.collect(new Tuple7<Long, String, String, Integer, Integer, Integer, Integer>(in.f0, in.f1, in.f2, in.f3, in.f4, in.f5, 3));
 				}
 			}
 		}).partitionByHash(1);
 
 		DataStream<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>> temp_result1
-				= temp1.join(s_xdr)
-				.onWindow(1, TimeUnit.MINUTES)
-				.where(1)
-				.equalTo(0)
-				.with(new JoinFunction<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>, Tuple3<String, String, Integer>, Tuple7<Long, String, String, Integer, Integer, Integer, Integer>>() {
-					@Override
-					public Tuple7<Long, String, String, Integer, Integer, Integer, Integer> join(Tuple7<Long, String, String, Integer, Integer, Integer, Integer> first, Tuple3<String, String, Integer> second) throws Exception {
-						Tuple7<Long, String, String, Integer, Integer, Integer, Integer> out
-								= first.copy();
-						return out;
-					}
-				}).partitionByHash(1);
+				= temp1.flatMap(new FlatMapFunction<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>, Tuple7<Long, String, String, Integer, Integer, Integer, Integer>>() {
+			@Override
+			public void flatMap(Tuple7<Long, String, String, Integer, Integer, Integer, Integer> value, Collector<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>> out) throws Exception {
+				insertHash(value.f1, value.f6);
+			}
+		}).partitionByHash(1);
+
+		DataStream<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>> temp_result2 = s_xdr.flatMap(new FlatMapFunction<Tuple3<String, String, Integer>, Tuple7<Long, String, String, Integer, Integer, Integer, Integer>>() {
+			@Override
+			public void flatMap(Tuple3<String, String, Integer> value, Collector<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>> out) throws Exception {
+				if (value == null || hashTable == null) {
+					return;
+				}
+
+				long idx = getHashValue(value.f0);
+
+//				while (hashTable.get(idx) != null) {
+//					if (value.f0 != null
+//							&& hashTable.get(idx).f0 != null
+//							&& value.f0 != hashTable.get(idx).f0) {
+//						idx++;
+//					}
+//				}
+
+				Tuple3<String, Integer, Long> result;
+				if ((result = hashTable.get(idx)) != null) {
+					out.collect(new Tuple7<Long, String, String, Integer, Integer, Integer, Integer>(0L, result.f0, "", result.f1, 0, 0, 0));
+				}
+
+			}
+		}).partitionByHash(1);
+
+//		DataStream<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>> temp_result1
+//				= temp1.join(s_xdr)
+//				.onWindow(1, TimeUnit.MINUTES)
+//				.where(1)
+//				.equalTo(0)
+//				.with(new JoinFunction<Tuple7<Long, String, String, Integer, Integer, Integer, Integer>, Tuple3<String, String, Integer>, Tuple7<Long, String, String, Integer, Integer, Integer, Integer>>() {
+//					@Override
+//					public Tuple7<Long, String, String, Integer, Integer, Integer, Integer> join(Tuple7<Long, String, String, Integer, Integer, Integer, Integer> first, Tuple3<String, String, Integer> second) throws Exception {
+//						Tuple7<Long, String, String, Integer, Integer, Integer, Integer> out
+//								= first.copy();
+//						return out;
+//					}
+//				}).partitionByHash(1);
 
 		if (fileOutput) {
 			temp_result1.writeAsText(outputPath, 1);
 		} else {
-			temp1.print();
-			temp_result1.print();
+//			temp_result2.print();
 		}
 
 		// execute program
@@ -146,5 +180,53 @@ public class SmartPccPoc {
 			return false;
 		}
 		return true;
+	}
+
+	//BKDRHash
+	private static long getHashValue(String MISDN) {
+		long result = 0;
+		for (int i = 0; i < MISDN.length(); i++) {
+			result = result * 131 + Long.valueOf(MISDN.charAt(i));
+		}
+		return (result & 0x7FFFFFFF) % 9999997;
+	}
+
+	//处理老化事件
+	private static void removeTimeOut() {
+		long curTime = System.currentTimeMillis();
+		long index;
+		Tuple3<Long, String, Long> e;
+		while (true){
+			e = timeOrder.getFirst();
+			if (curTime - e.f0 > FIVE_MINUS) {
+				index = e.f2;
+				timeOrder.remove(e);
+				hashTable.remove(index);
+			} else {
+				break;
+			}
+		}
+	}
+
+	public static void insertHash(String MISDN, int fixNum){
+
+		//获取MISDN哈希值
+		long hash = getHashValue(MISDN);
+//		while (hashTable.get(hash) != null) {
+//			hash++;
+//		}
+
+		//插入时间序列表
+		long curTime = System.currentTimeMillis();
+		Tuple3<Long, String, Long> timeInfo = new Tuple3<>(curTime, MISDN, hash);
+		long index = timeOrder.size();
+		timeOrder.addLast(timeInfo);
+
+		//插入哈希表
+		Tuple3<String, Integer, Long> hashInfo = new Tuple3<>(MISDN, fixNum, index);
+		hashTable.put(hash, hashInfo);
+
+		//处理老化事件
+		removeTimeOut();
 	}
 }
