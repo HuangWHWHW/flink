@@ -350,6 +350,29 @@ under the License.
                         </configuration>
                     </execution>
 
+                    <!-- IntCounter -->
+                    <execution>
+                        <id>IntCount</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>IntCount</classifier>
+
+                            <archive>
+                                <manifestEntries>
+                                    <program-class>org.apache.flink.streaming.examples.accumulator.IntCount</program-class>
+                                </manifestEntries>
+                            </archive>
+
+                            <includes>
+                                <include>org/apache/flink/streaming/examples/accumulator/IntCount.class</include>
+                                <include>org/apache/flink/streaming/examples/accumulator/IntCount$*.class</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+
 					<!-- TopSpeedWindowing -->
 					<execution>
 						<id>TopSpeedWindowing</id>

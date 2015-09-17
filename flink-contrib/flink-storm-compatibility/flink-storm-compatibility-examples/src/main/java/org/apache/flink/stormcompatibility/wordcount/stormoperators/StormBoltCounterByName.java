@@ -17,6 +17,7 @@
 
 package org.apache.flink.stormcompatibility.wordcount.stormoperators;
 
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
@@ -42,10 +43,15 @@ public class StormBoltCounterByName implements IRichBolt {
 	private final HashMap<String, Count> counts = new HashMap<String, Count>();
 	private OutputCollector collector;
 
+	transient MultiCountMetric _wordCountMetric;
+
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void prepare(final Map stormConf, final TopologyContext context, final OutputCollector collector) {
 		this.collector = collector;
+		this._wordCountMetric = new MultiCountMetric();
+		context.registerMetric("word_count", _wordCountMetric, 60);
 	}
 
 	@Override
@@ -60,6 +66,7 @@ public class StormBoltCounterByName implements IRichBolt {
 		currentCount.count += input.getIntegerByField(StormBoltTokenizer.ATTRIBUTE_COUNT);
 
 		this.collector.emit(new Values(word, currentCount.count));
+		_wordCountMetric.scope(input.toString()).incr();
 	}
 
 	@Override
