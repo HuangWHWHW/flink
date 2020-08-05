@@ -124,9 +124,11 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 public class StreamExecutionEnvironment {
 
 	/** The default name to use for a streaming job if no other name has been specified. */
+	// 默认作业名
 	public static final String DEFAULT_JOB_NAME = "Flink Streaming Job";
 
 	/** The time characteristic that is used if none other is set. */
+	// 默认以处理时间为准，这是一个枚举类型，共3种时间：处理时间（ProcessingTime），摄取时间（IngestionTime），事件事件（EventTime）
 	private static final TimeCharacteristic DEFAULT_TIME_CHARACTERISTIC = TimeCharacteristic.ProcessingTime;
 
 	/** The default buffer timeout (max delay of records in the network stack). */
@@ -135,12 +137,16 @@ public class StreamExecutionEnvironment {
 	/**
 	 * The environment of the context (local by default, cluster if invoked through command line).
 	 */
+	// 一个封装了createEnv的接口，可以实现该接口来实现不同的工厂类
 	private static StreamExecutionEnvironmentFactory contextEnvironmentFactory = null;
 
 	/** The ThreadLocal used to store {@link StreamExecutionEnvironmentFactory}. */
+	// ThreadLocal在线程内部提供共享变量，参考 https://blog.csdn.net/qq_38293564/article/details/80459827
+	// 这样能实现不同的线程里面拿到的env都是隔离的
 	private static final ThreadLocal<StreamExecutionEnvironmentFactory> threadLocalContextEnvironmentFactory = new ThreadLocal<>();
 
 	/** The default parallelism used when creating a local environment. */
+	// 默认并发度，根据JVM占用的核数（一般为机器的CPU个数）
 	private static int defaultLocalParallelism = Runtime.getRuntime().availableProcessors();
 
 	// ------------------------------------------------------------------------
@@ -163,6 +169,7 @@ public class StreamExecutionEnvironment {
 	/** The time characteristic used by the data streams. */
 	private TimeCharacteristic timeCharacteristic = DEFAULT_TIME_CHARACTERISTIC;
 
+	// 缓存文件元数据，DistributedCache.DistributedCacheEntry只是一个POJO类，存放文件路径、是否压缩等信息
 	protected final List<Tuple2<String, DistributedCache.DistributedCacheEntry>> cacheFile = new ArrayList<>();
 
 	private final PipelineExecutorServiceLoader executorServiceLoader;
@@ -171,6 +178,7 @@ public class StreamExecutionEnvironment {
 
 	private final ClassLoader userClassloader;
 
+	// 作业监听器
 	private final List<JobListener> jobListeners = new ArrayList<>();
 
 	// --------------------------------------------------------------------------------------------
@@ -1934,6 +1942,8 @@ public class StreamExecutionEnvironment {
 	 * executed.
 	 */
 	public static StreamExecutionEnvironment getExecutionEnvironment() {
+		// local模式下，treadLocal和本地context都是null，因此直接调用createLocalEnvironment，并返回一个
+		// {@link #LocalStreamEnvironment()}
 		return Utils.resolveFactory(threadLocalContextEnvironmentFactory, contextEnvironmentFactory)
 			.map(StreamExecutionEnvironmentFactory::createExecutionEnvironment)
 			.orElseGet(StreamExecutionEnvironment::createLocalEnvironment);
@@ -1949,6 +1959,7 @@ public class StreamExecutionEnvironment {
 	 * @return A local execution environment.
 	 */
 	public static LocalStreamEnvironment createLocalEnvironment() {
+		// local模式下并发度为核数
 		return createLocalEnvironment(defaultLocalParallelism);
 	}
 

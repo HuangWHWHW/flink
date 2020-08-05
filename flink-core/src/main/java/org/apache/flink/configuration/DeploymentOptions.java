@@ -36,6 +36,9 @@ public class DeploymentOptions {
 					.noDefaultValue()
 					.withDescription("The deployment target for the execution, e.g. \"local\" for local execution.");
 
+	// flink提供了两种基于yarn的提交模式，attached和detached。无论是jb和tm的提交还是任务的提交都支持这两种模式。
+	// 和spark基于yarn的两种模式不同，flink的这两种模式仅仅只是在client端阻塞和非阻塞的区别，
+	// attached模式会hold yarn的session直到任务执行结束，detached模式在提交完任务后就退出client
 	public static final ConfigOption<Boolean> ATTACHED =
 			key("execution.attached")
 					.booleanType()

@@ -57,7 +57,14 @@ public class LocalStreamEnvironment extends StreamExecutionEnvironment {
 		setParallelism(1);
 	}
 
+	/**
+	 * 校验配置项
+	 *
+	 * @param configuration
+	 * @return
+	 */
 	private static Configuration validateAndGetConfiguration(final Configuration configuration) {
+		// local模式下该方法返回true
 		if (!ExecutionEnvironment.areExplicitEnvironmentsAllowed()) {
 			throw new InvalidProgramException(
 					"The LocalStreamEnvironment cannot be used when submitting a program through a client, " +
@@ -65,6 +72,8 @@ public class LocalStreamEnvironment extends StreamExecutionEnvironment {
 		}
 		final Configuration effectiveConfiguration = new Configuration(checkNotNull(configuration));
 		effectiveConfiguration.set(DeploymentOptions.TARGET, "local");
+
+		// 设置提交作业的模式，有attach和detach两种
 		effectiveConfiguration.set(DeploymentOptions.ATTACHED, true);
 		return effectiveConfiguration;
 	}

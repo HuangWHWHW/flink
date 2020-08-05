@@ -149,6 +149,7 @@ public class StreamContextEnvironment extends StreamExecutionEnvironment {
 			final ClassLoader userCodeClassLoader,
 			final boolean enforceSingleJobExecution,
 			final boolean suppressSysout) {
+		// 匿名类，利用lambda表达式实现创建StreamExecutionEnv的方法
 		StreamExecutionEnvironmentFactory factory = () -> new StreamContextEnvironment(
 			executorServiceLoader,
 			configuration,

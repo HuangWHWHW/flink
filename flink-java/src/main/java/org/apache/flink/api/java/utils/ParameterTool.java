@@ -63,6 +63,7 @@ public class ParameterTool extends AbstractParameterTool {
 	 * @return A {@link ParameterTool}
 	 */
 	public static ParameterTool fromArgs(String[] args) {
+		// 因为是kv对，所以配置项的个数是长度的一半
 		final Map<String, String> map = new HashMap<>(args.length / 2);
 
 		int i = 0;
@@ -164,10 +165,12 @@ public class ParameterTool extends AbstractParameterTool {
 	protected final Map<String, String> data;
 
 	private ParameterTool(Map<String, String> data) {
+		// 封装成不可改map，put和remove操作会抛出异常 {@code UnsupportedOperationException}
 		this.data = Collections.unmodifiableMap(new HashMap<>(data));
 
 		this.defaultData = new ConcurrentHashMap<>(data.size());
 
+		// 从map的data中取出keyset
 		this.unrequestedParameters = Collections.newSetFromMap(new ConcurrentHashMap<>(data.size()));
 
 		unrequestedParameters.addAll(data.keySet());

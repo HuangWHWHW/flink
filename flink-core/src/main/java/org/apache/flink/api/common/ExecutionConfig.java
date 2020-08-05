@@ -95,10 +95,13 @@ public class ExecutionConfig implements Serializable, Archiveable<ArchivedExecut
 	// --------------------------------------------------------------------------------------------
 
 	/** Defines how data exchange happens - batch or pipelined */
+	// 默认为pipelined-流式，batch为批式
 	private ExecutionMode executionMode = ExecutionMode.PIPELINED;
 
+	// 退出清理模式，默认为递归清理
 	private ClosureCleanerLevel closureCleanerLevel = ClosureCleanerLevel.RECURSIVE;
 
+	// 默认并发为1
 	private int parallelism = CoreOptions.DEFAULT_PARALLELISM.defaultValue();
 
 	/**
